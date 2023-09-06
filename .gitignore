@@ -1,0 +1,6 @@
+# datasets
+data/*
+datasets/*
+
+# python env
+env/*
