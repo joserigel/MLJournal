@@ -3,12 +3,15 @@ import torch.nn as nn
 import torch.nn.functional as F
 from tqdm import tqdm
 
+# Get Device
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 # Targets
 data = {
-    "DOG" : torch.tensor([1, 0, 0, 0], dtype=torch.uint8, device='cuda'),
-    "CAT" : torch.tensor([0, 1, 0, 0], dtype=torch.uint8, device='cuda'),
-    "BIRD":  torch.tensor([0, 0, 1, 0], dtype=torch.uint8, device='cuda'),
-    "FISH":  torch.tensor([0, 0, 0, 1], dtype=torch.uint8, device='cuda'),
+    "DOG" : torch.tensor([1, 0, 0, 0], dtype=torch.uint8, device=device),
+    "CAT" : torch.tensor([0, 1, 0, 0], dtype=torch.uint8, device=device),
+    "BIRD":  torch.tensor([0, 0, 1, 0], dtype=torch.uint8, device=device),
+    "FISH":  torch.tensor([0, 0, 0, 1], dtype=torch.uint8, device=device),
 }
 targets = {
     "DOG": 1,
@@ -33,7 +36,8 @@ model = NeuralNetwork()
 model.fc.weight.data = torch.ones_like(model.fc.weight.data)
 model.fc.bias.data = torch.zeros_like(model.fc.bias.data)
 model.zero_grad()
-model = model.cuda()
+if (torch.cuda.is_available()):
+    model = model.cuda()
 
 print("="*5, "BEFORE", "="*5)
 for name, param in model.named_parameters():
@@ -41,13 +45,13 @@ for name, param in model.named_parameters():
 
 print("="*5, "TRAIN", "="*5)
 # Optimizing Model
-learning_rate = 0.1
+learning_rate = 0.01
 iteration = 1000
 for i in tqdm(range(iteration)):
     for key, value in data.items():
         model.zero_grad()
         output = model(value)
-        target = torch.full_like(output, targets[key], device='cuda')
+        target = torch.full_like(output, targets[key], device=device)
         criterion = nn.MSELoss()
         loss = criterion(output, target)
         loss.backward()
